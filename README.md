@@ -22,9 +22,7 @@ payment.service.js → HMAC-SHA256 verify → ✅ valid
       │
       ▼  email.service.js → Nodemailer → Gmail → buyer receives download link
 ```
-
 ---
-
 ## Folder Structure
 
 ```
@@ -152,13 +150,17 @@ prefill: { email, name: '' }
 await verifyAndDeliver({ ...response, email });
 ```
 
-**Option B — Fetch from Razorpay API (server-side):**
-```js
-// In /api/verify-payment, after signature verification:
-const payment = await razorpayClient.payments.fetch(razorpay_payment_id);
-const buyerEmail = payment.email;
-```
-
+## INformation FLow - Clean Flow
+---
+Form input (name + email)
+      ↓  validated
+Razorpay checkout opens (prefilled)
+      ↓  payment success
+verifyAndDeliver({ ...razorpayResponse, name, email })
+      ↓
+POST /api/verify-payment  → signature check → send email to buyer.email
+      ↓
+Success modal shows the exact email address used
 ---
 
 ## Running Tests
@@ -189,8 +191,6 @@ Update `RAZORPAY_KEY_ID` in `index.html` to your live key when ready.
 ---
 
 ## What's Next
-
-- [ ] Add an email input field on the page so buyer email is captured before payment
 - [ ] Log every purchase to a Google Sheet or SQLite DB
 - [ ] Add WhatsApp delivery (AiSensy) alongside email
 - [ ] Set up a webhook endpoint (`/webhook/razorpay`) as a fallback for missed payments
