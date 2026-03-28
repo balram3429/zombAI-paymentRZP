@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -291,6 +292,64 @@
       flex-shrink: 0;
     }
 
+    /* ── FORM FIELDS ── */
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .field {
+      position: relative;
+    }
+
+    .field label {
+      display: block;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(247,242,234,.35);
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(247,242,234,.1);
+      border-radius: 3px;
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13.5px;
+      font-weight: 300;
+      outline: none;
+      transition: border-color .2s, background .2s;
+      -webkit-appearance: none;
+    }
+
+    .field input::placeholder { color: rgba(247,242,234,.2); }
+
+    .field input:focus {
+      border-color: rgba(200,151,58,.5);
+      background: rgba(200,151,58,.05);
+    }
+
+    .field input.error {
+      border-color: rgba(185,74,44,.6);
+    }
+
+    .field-error {
+      font-size: 11px;
+      color: #e07060;
+      margin-top: 4px;
+      min-height: 16px;
+      display: none;
+    }
+
+    .field-error.show { display: block; }
+
     /* ── BUY BUTTON ── */
     #buyBtn {
       width: 100%;
@@ -440,6 +499,100 @@
       cursor: pointer;
     }
 
+    /* ── FULL-SCREEN LOADER OVERLAY ── */
+    .loader-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15,12,10,.75);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .loader-overlay.show { display: flex; }
+
+    /* Spinning ring */
+    .loader-ring {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 2.5px solid rgba(200,151,58,.15);
+      border-top-color: var(--gold);
+      animation: spin .8s linear infinite;
+    }
+
+    .loader-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .loader-dots span {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--gold);
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    .loader-dots span:nth-child(2) { animation-delay: .2s; }
+    .loader-dots span:nth-child(3) { animation-delay: .4s; }
+
+    .loader-status {
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: .08em;
+      color: rgba(247,242,234,.6);
+      text-align: center;
+      min-height: 18px;
+      transition: opacity .2s;
+    }
+
+    .loader-sub {
+      font-size: 11px;
+      color: rgba(247,242,234,.25);
+      letter-spacing: .05em;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: .3; transform: scale(.8); }
+      50%       { opacity: 1;  transform: scale(1); }
+    }
+
+    /* Modal OK button loading state */
+    .modal-close.loading {
+      opacity: .7;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .modal-close .ok-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .ok-spinner {
+      display: none;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      border: 2px solid rgba(247,242,234,.3);
+      border-top-color: var(--cream);
+      animation: spin .7s linear infinite;
+    }
+
+    .modal-close.loading .ok-spinner { display: block; }
+
     /* ── TOAST ── */
     .toast {
       position: fixed;
@@ -549,6 +702,33 @@
         </li>
       </ul>
 
+      <!-- ── BUYER DETAILS FORM ── -->
+      <div class="field-group">
+        <div class="field">
+          <label for="buyerName">Your Name</label>
+          <input
+            type="text"
+            id="buyerName"
+            placeholder="Rahul Sharma"
+            autocomplete="name"
+            maxlength="80"
+          />
+          <div class="field-error" id="nameError">Please enter your name</div>
+        </div>
+
+        <div class="field">
+          <label for="buyerEmail">Email — ebook will be sent here</label>
+          <input
+            type="email"
+            id="buyerEmail"
+            placeholder="rahul@gmail.com"
+            autocomplete="email"
+            maxlength="120"
+          />
+          <div class="field-error" id="emailError">Please enter a valid email address</div>
+        </div>
+      </div>
+
       <button id="buyBtn" onclick="startPayment()">
         <span class="btn-inner">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -582,6 +762,16 @@
   </div>
 </section>
 
+<!-- ── FULL-SCREEN LOADER OVERLAY ── -->
+<div class="loader-overlay" id="loaderOverlay">
+  <div class="loader-ring"></div>
+  <div class="loader-dots">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="loader-status" id="loaderStatus">Please wait…</div>
+  <div class="loader-sub">Do not close or refresh this page</div>
+</div>
+
 <!-- ── SUCCESS MODAL ── -->
 <div class="modal-overlay" id="successModal">
   <div class="modal">
@@ -589,12 +779,17 @@
       <svg width="28" height="28" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
     </div>
     <h2>You're all set! 🎉</h2>
-    <p>Your payment was successful. The ebook is on its way to</p>
+    <p>Your payment was successful. We'll send the ebook to</p>
     <p class="modal-email" id="modalEmail">your inbox</p>
     <p style="margin-top:16px; font-size:13px; color:#8a7a6a;">
-      Check your spam folder if you don't see it within 2 minutes.
+      Click OK to receive your ebook. Check spam if it doesn't arrive within 2 minutes.
     </p>
-    <button class="modal-close" onclick="closeModal()">Done</button>
+    <button class="modal-close" id="modalOkBtn" onclick="handleModalOk()">
+      <span class="ok-inner">
+        <span class="ok-spinner"></span>
+        <span class="ok-label">OK — Send My Ebook</span>
+      </span>
+    </button>
   </div>
 </div>
 
@@ -605,21 +800,85 @@
   // ─────────────────────────────────────────────
   // CONFIG — update these two values
   // ─────────────────────────────────────────────
-  const BACKEND_URL = 'http://localhost:3000'; // your server URL
-  const RAZORPAY_KEY_ID = 'rzp_test_XXXXXXXXXX'; // your Razorpay key
+  const BACKEND_URL     = 'http://localhost:3000'; // your server URL
+  const RAZORPAY_KEY_ID = 'rzp_test_XXXXXXXXXX';  // your Razorpay key ID
+
+  // Holds verified buyer info so modal OK can use it
+  let _verifiedBuyer = null;
 
   // ─────────────────────────────────────────────
+  // LOADER HELPERS
+  // ─────────────────────────────────────────────
+  function showLoader(message = 'Please wait…') {
+    document.getElementById('loaderStatus').textContent = message;
+    document.getElementById('loaderOverlay').classList.add('show');
+  }
+
+  function updateLoader(message) {
+    const el = document.getElementById('loaderStatus');
+    el.style.opacity = '0';
+    setTimeout(() => {
+      el.textContent  = message;
+      el.style.opacity = '1';
+    }, 150);
+  }
+
+  function hideLoader() {
+    document.getElementById('loaderOverlay').classList.remove('show');
+  }
+
+  // ─────────────────────────────────────────────
+  // VALIDATION
+  // ─────────────────────────────────────────────
+  function validateForm() {
+    const name    = document.getElementById('buyerName').value.trim();
+    const email   = document.getElementById('buyerEmail').value.trim();
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let valid = true;
+
+    const nameEl  = document.getElementById('buyerName');
+    const nameErr = document.getElementById('nameError');
+    if (!name) {
+      nameEl.classList.add('error'); nameErr.classList.add('show');
+      valid = false;
+    } else {
+      nameEl.classList.remove('error'); nameErr.classList.remove('show');
+    }
+
+    const emailEl  = document.getElementById('buyerEmail');
+    const emailErr = document.getElementById('emailError');
+    if (!email || !emailRe.test(email)) {
+      emailEl.classList.add('error'); emailErr.classList.add('show');
+      valid = false;
+    } else {
+      emailEl.classList.remove('error'); emailErr.classList.remove('show');
+    }
+
+    return valid ? { name, email } : null;
+  }
+
+  ['buyerName', 'buyerEmail'].forEach(id => {
+    document.getElementById(id).addEventListener('input', function () {
+      this.classList.remove('error');
+      document.getElementById(id === 'buyerName' ? 'nameError' : 'emailError')
+              .classList.remove('show');
+    });
+  });
+
+  // ─────────────────────────────────────────────
+  // STEP 1 — Start Payment
+  // ─────────────────────────────────────────────
   async function startPayment() {
+    const buyer = validateForm();
+    if (!buyer) return;
+
     const btn = document.getElementById('buyBtn');
     btn.disabled = true;
-    btn.querySelector('.btn-inner').innerHTML = `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-      </svg>
-      Creating order…`;
+
+    // Show loader while creating order
+    showLoader('Creating your order…');
 
     try {
-      // 1. Create order on backend
       const res = await fetch(`${BACKEND_URL}/api/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -629,44 +888,54 @@
       if (!res.ok) throw new Error('Could not create order');
       const { orderId, amount, currency } = await res.json();
 
-      // 2. Open Razorpay checkout
+      // Hide loader before opening Razorpay (it has its own UI)
+      hideLoader();
+
       const options = {
-        key: RAZORPAY_KEY_ID,
+        key:         RAZORPAY_KEY_ID,
         amount,
         currency,
-        name: 'Digital Mastery Guide',
+        name:        'Digital Mastery Guide',
         description: 'Complete Edition 2025',
-        order_id: orderId,
-        prefill: { method: '' }, // let customer choose
-        theme: { color: '#c8973a' },
-        modal: { backdropclose: false },
+        order_id:    orderId,
+        prefill:     { name: buyer.name, email: buyer.email },
+        theme:       { color: '#c8973a' },
+        modal:       { backdropclose: false },
 
         handler: async function (response) {
-          await verifyAndDeliver(response);
+          // Payment done — show loader while we verify
+          showLoader('Payment received! Verifying…');
+          await verifyPayment({ ...response, name: buyer.name, email: buyer.email });
         },
-        
-        // Re-enable button if modal is closed
-        'modal.ondismiss': function() {
+
+        ondismiss: function () {
+          hideLoader();
           resetBtn();
         }
       };
 
       const rzp = new Razorpay(options);
       rzp.on('payment.failed', function (resp) {
+        hideLoader();
         showToast('Payment failed: ' + resp.error.description);
         resetBtn();
       });
       rzp.open();
 
     } catch (err) {
+      hideLoader();
       showToast('Something went wrong. Please try again.');
       resetBtn();
     }
   }
 
   // ─────────────────────────────────────────────
-  async function verifyAndDeliver(paymentResponse) {
+  // STEP 2 — Verify Payment (signature check only)
+  // ─────────────────────────────────────────────
+  async function verifyPayment(paymentResponse) {
     try {
+      updateLoader('Confirming your payment…');
+
       const res = await fetch(`${BACKEND_URL}/api/verify-payment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -676,35 +945,76 @@
       const data = await res.json();
 
       if (data.success) {
-        document.getElementById('modalEmail').textContent = data.email || 'your inbox';
+        // Store buyer details for the modal OK step
+        _verifiedBuyer = {
+          name:      paymentResponse.name,
+          email:     paymentResponse.email,
+          paymentId: paymentResponse.razorpay_payment_id,
+        };
+
+        hideLoader();
+        document.getElementById('modalEmail').textContent = paymentResponse.email;
         document.getElementById('successModal').classList.add('show');
       } else {
-        showToast('Verification failed. Contact support with your payment ID.');
+        hideLoader();
+        showToast('Payment verification failed. Please contact support.');
+        resetBtn();
       }
     } catch {
-      showToast('Payment done, but delivery may be delayed. We will email you shortly.');
-    } finally {
+      hideLoader();
+      showToast('Verification error. Your payment is safe — please contact support.');
       resetBtn();
     }
   }
 
+  // ─────────────────────────────────────────────
+  // STEP 3 — Modal OK: Send Email + Redirect Home
+  // ─────────────────────────────────────────────
+  async function handleModalOk() {
+    const okBtn = document.getElementById('modalOkBtn');
+    okBtn.classList.add('loading');
+    okBtn.querySelector('.ok-label').textContent = 'Sending ebook…';
+
+    try {
+      // Send the ebook email via backend
+      const res = await fetch(`${BACKEND_URL}/api/send-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(_verifiedBuyer)
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        okBtn.querySelector('.ok-label').textContent = 'Ebook sent! Redirecting…';
+        // Short pause so user reads the confirmation, then go home
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1200);
+      } else {
+        throw new Error('Email send failed');
+      }
+    } catch {
+      // Email failed but payment was captured — still redirect, support can follow up
+      okBtn.querySelector('.ok-label').textContent = 'Done! Redirecting…';
+      showToast('Ebook delivery delayed — we'll email you within 10 minutes.');
+      setTimeout(() => { window.location.href = '/'; }, 2000);
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // HELPERS
+  // ─────────────────────────────────────────────
   function resetBtn() {
     const btn = document.getElementById('buyBtn');
     btn.disabled = false;
-    btn.querySelector('.btn-inner').innerHTML = `
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      Buy Now — ₹499`;
-  }
-
-  function closeModal() {
-    document.getElementById('successModal').classList.remove('show');
   }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 4000);
+    setTimeout(() => t.classList.remove('show'), 5000);
   }
 </script>
 </body>
