@@ -1,4 +1,4 @@
-# 📖 Ebook Payment System — Developer Guide
+# 📖 Digital Payment System — Developer Guide
 
 Full-stack ebook payment + delivery system for the Indian market.
 **Razorpay checkout → signature verification → Gmail delivery.**
